@@ -1,41 +1,30 @@
-name: Full Book OCR - Free No API
+name: Fast OCR Free
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - '*.pdf'
-      - 'ocr.py'
 
 jobs:
   ocr-job:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-
-      - name: Setup Python 3.10
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      - name: Install Dependencies
+      - name: Install Tesseract + Bengali + Arabic
         run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
+          sudo apt-get update
+          sudo apt-get install -y tesseract-ocr tesseract-ocr-ben tesseract-ocr-ara tesseract-ocr-eng
 
-      - name: Run Full Book OCR
-        run: |
-          python ocr.py
+      - name: Install Python deps
+        run: pip install -r requirements.txt
 
-      - name: Show Output
-        run: |
-          ls -lh
-          head -n 100 full_book_text.txt
+      - name: Run Fast OCR
+        run: python ocr.py
 
-      - name: Upload Final Text File
+      - name: Upload Result
         uses: actions/upload-artifact@v4
         with:
-          name: full-book-text-result
+          name: full-book-text
           path: full_book_text.txt
